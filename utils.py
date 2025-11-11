@@ -7,7 +7,11 @@ import json
 from typing import List, Dict, Optional
 
 
-def get_abi_from_etherscan(contract_address: str, etherscan_api_key: Optional[str] = None, network: str = "mainnet") -> List[Dict]:
+def get_abi_from_etherscan(
+    contract_address: str,
+    etherscan_api_key: Optional[str] = None,
+    network: str = "mainnet",
+) -> List[Dict]:
     """
     Fetch the ABI for a verified contract from Etherscan.
 
@@ -37,11 +41,16 @@ def get_abi_from_etherscan(contract_address: str, etherscan_api_key: Optional[st
     network_config = {
         "mainnet": {"url": "https://api.etherscan.io/v2/api", "chainid": "1"},
         "goerli": {"url": "https://api-goerli.etherscan.io/v2/api", "chainid": "5"},
-        "sepolia": {"url": "https://api-sepolia.etherscan.io/v2/api", "chainid": "11155111"},
+        "sepolia": {
+            "url": "https://api-sepolia.etherscan.io/v2/api",
+            "chainid": "11155111",
+        },
     }
 
     if network not in network_config:
-        raise ValueError(f"Unsupported network: {network}. Supported: {list(network_config.keys())}")
+        raise ValueError(
+            f"Unsupported network: {network}. Supported: {list(network_config.keys())}"
+        )
 
     config = network_config[network]
     api_url = config["url"]
@@ -66,7 +75,9 @@ def get_abi_from_etherscan(contract_address: str, etherscan_api_key: Optional[st
         data = response.json()
 
         if data["status"] != "1":
-            raise ValueError(f"Etherscan API error: {data.get('result', 'Unknown error')}")
+            raise ValueError(
+                f"Etherscan API error: {data.get('result', 'Unknown error')}"
+            )
 
         # Parse the ABI JSON string
         abi = json.loads(data["result"])
@@ -101,7 +112,9 @@ def extract_function_abi(full_abi: List[Dict], function_name: str) -> Optional[D
     return None
 
 
-def extract_functions_abi(full_abi: List[Dict], function_names: List[str]) -> List[Dict]:
+def extract_functions_abi(
+    full_abi: List[Dict], function_names: List[str]
+) -> List[Dict]:
     """
     Extract multiple functions' ABI entries from a full contract ABI.
 
@@ -125,8 +138,12 @@ def extract_functions_abi(full_abi: List[Dict], function_names: List[str]) -> Li
     return result
 
 
-def get_minimal_abi(contract_address: str, function_names: List[str],
-                   etherscan_api_key: Optional[str] = None, network: str = "mainnet") -> List[Dict]:
+def get_minimal_abi(
+    contract_address: str,
+    function_names: List[str],
+    etherscan_api_key: Optional[str] = None,
+    network: str = "mainnet",
+) -> List[Dict]:
     """
     Fetch a minimal ABI containing only specific functions from a contract.
 

@@ -13,7 +13,9 @@ from web3 import Web3
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 from uniswap import analyze_trade_costs, plot_price_impact
 
@@ -47,7 +49,7 @@ df_high_liquidity = analyze_trade_costs(
     token_in_symbol="USDC",
     token_out_symbol="WBTC",
     amounts_in=[1000, 10000, 100000, 1000000],  # Large trades work fine
-    verbose=True
+    verbose=True,
 )
 
 print("\n💡 Notice: All trades succeed with low price impact (<1%)")
@@ -64,7 +66,7 @@ df_low_liquidity = analyze_trade_costs(
     token_in_symbol="FLOKI",
     token_out_symbol="WETH",
     amounts_in=[0.1, 1, 10, 100],  # Much smaller amounts!
-    verbose=True
+    verbose=True,
 )
 
 print("\n💡 Notice: Even small trades may fail due to insufficient liquidity")
@@ -76,15 +78,19 @@ print("\n\n📊 COMPARISON")
 print("=" * 70)
 
 if len(df_high_liquidity) > 0:
-    avg_impact_high = df_high_liquidity['price_impact_bps'].mean()
+    avg_impact_high = df_high_liquidity["price_impact_bps"].mean()
     print(f"High-Liquidity (USDC/WBTC):")
-    print(f"  Average Price Impact: {avg_impact_high:.2f} bps ({avg_impact_high/100:.2f}%)")
+    print(
+        f"  Average Price Impact: {avg_impact_high:.2f} bps ({avg_impact_high/100:.2f}%)"
+    )
     print(f"  Successful trades: {len(df_high_liquidity)}/4")
 
 if len(df_low_liquidity) > 0:
-    avg_impact_low = df_low_liquidity['price_impact_bps'].mean()
+    avg_impact_low = df_low_liquidity["price_impact_bps"].mean()
     print(f"\nLow-Liquidity (FLOKI/WETH):")
-    print(f"  Average Price Impact: {avg_impact_low:.2f} bps ({avg_impact_low/100:.2f}%)")
+    print(
+        f"  Average Price Impact: {avg_impact_low:.2f} bps ({avg_impact_low/100:.2f}%)"
+    )
     print(f"  Successful trades: {len(df_low_liquidity)}/4")
 
     if len(df_high_liquidity) > 0:

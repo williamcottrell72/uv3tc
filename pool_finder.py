@@ -8,17 +8,19 @@ from web3 import Web3
 FACTORY_ADDRESS = Web3.to_checksum_address("0x1F98431c8aD98523631AE4a59f267346ea31F984")
 
 # Factory ABI - just the getPool function
-FACTORY_ABI = [{
-    "inputs": [
-        {"internalType": "address", "name": "tokenA", "type": "address"},
-        {"internalType": "address", "name": "tokenB", "type": "address"},
-        {"internalType": "uint24", "name": "fee", "type": "uint24"}
-    ],
-    "name": "getPool",
-    "outputs": [{"internalType": "address", "name": "pool", "type": "address"}],
-    "stateMutability": "view",
-    "type": "function"
-}]
+FACTORY_ABI = [
+    {
+        "inputs": [
+            {"internalType": "address", "name": "tokenA", "type": "address"},
+            {"internalType": "address", "name": "tokenB", "type": "address"},
+            {"internalType": "uint24", "name": "fee", "type": "uint24"},
+        ],
+        "name": "getPool",
+        "outputs": [{"internalType": "address", "name": "pool", "type": "address"}],
+        "stateMutability": "view",
+        "type": "function",
+    }
+]
 
 
 def find_pool_address(w3, token_a, token_b, fee):
@@ -97,21 +99,14 @@ def discover_pool(w3, token_in_symbol, token_out_symbol, preferred_fee=None):
     if preferred_fee:
         try:
             pool_address = find_pool_address(
-                w3,
-                token_in["address"],
-                token_out["address"],
-                preferred_fee
+                w3, token_in["address"], token_out["address"], preferred_fee
             )
             return {"address": pool_address, "fee": preferred_fee}
         except ValueError:
             pass
 
     # Try to find any available pool
-    all_pools = find_all_pools_for_pair(
-        w3,
-        token_in["address"],
-        token_out["address"]
-    )
+    all_pools = find_all_pools_for_pair(w3, token_in["address"], token_out["address"])
 
     if not all_pools:
         raise ValueError(

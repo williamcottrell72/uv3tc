@@ -11,14 +11,16 @@ import json
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 from uniswap import (
     get_abi_from_etherscan,
     extract_function_abi,
     get_minimal_abi,
     print_function_signature,
-    UNISWAP_V3_ADDRESSES
+    UNISWAP_V3_ADDRESSES,
 )
 
 # Check for Etherscan API key
@@ -82,9 +84,7 @@ print("=" * 70)
 
 try:
     minimal_quoter_abi = get_minimal_abi(
-        quoter_address,
-        ["quoteExactInputSingle"],
-        etherscan_api_key
+        quoter_address, ["quoteExactInputSingle"], etherscan_api_key
     )
 
     print(f"✓ Minimal ABI created with {len(minimal_quoter_abi)} entry")
@@ -95,7 +95,9 @@ try:
     print("Comparison:")
     print(f"  Full QuoterV2 ABI:    {len(quoter_abi)} entries")
     print(f"  Minimal ABI:          {len(minimal_quoter_abi)} entry")
-    print(f"  Size reduction:       {(1 - len(minimal_quoter_abi)/len(quoter_abi))*100:.1f}%")
+    print(
+        f"  Size reduction:       {(1 - len(minimal_quoter_abi)/len(quoter_abi))*100:.1f}%"
+    )
     print("=" * 70)
 
 except Exception as e:
@@ -135,7 +137,8 @@ print("\n" + "=" * 70)
 print("Success!")
 print("=" * 70)
 print("\nThese ABIs can be used in web3.py like this:")
-print("""
+print(
+    """
 from web3 import Web3
 
 w3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/YOUR_KEY"))
@@ -145,5 +148,6 @@ quoter = w3.eth.contract(address=quoter_address, abi=minimal_quoter_abi)
 
 # Call the function
 result = quoter.functions.quoteExactInputSingle(params).call()
-""")
+"""
+)
 print("=" * 70)

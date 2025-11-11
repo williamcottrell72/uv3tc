@@ -21,23 +21,23 @@ TOKENS = {
     "USDC": {
         "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "decimals": 6,
-        "symbol": "USDC"
+        "symbol": "USDC",
     },
     "WETH": {
         "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "decimals": 18,
-        "symbol": "WETH"
+        "symbol": "WETH",
     },
     "WBTC": {
         "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
         "decimals": 8,
-        "symbol": "WBTC"
+        "symbol": "WBTC",
     },
     "DAI": {
         "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
         "decimals": 18,
-        "symbol": "DAI"
-    }
+        "symbol": "DAI",
+    },
 }
 
 # Common pool addresses (mainnet)
@@ -51,9 +51,9 @@ POOLS = {
 # Fee tiers
 FEE_TIERS = {
     ("USDC", "WBTC"): 3000,  # 0.3%
-    ("USDC", "WETH"): 500,   # 0.05%
+    ("USDC", "WETH"): 500,  # 0.05%
     ("WETH", "WBTC"): 3000,  # 0.3%
-    ("DAI", "USDC"): 100,    # 0.01%
+    ("DAI", "USDC"): 100,  # 0.01%
 }
 
 
@@ -72,17 +72,38 @@ def get_pool_and_fee(token_in_symbol, token_out_symbol):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test Uniswap V3 trade cost estimation")
-    parser.add_argument("--token-in", default="USDC", choices=TOKENS.keys(),
-                        help="Input token symbol (default: USDC)")
-    parser.add_argument("--token-out", default="WBTC", choices=TOKENS.keys(),
-                        help="Output token symbol (default: WBTC)")
-    parser.add_argument("--amount", type=float, default=1000.0,
-                        help="Input amount in human-readable units (default: 1000)")
-    parser.add_argument("--fee", type=int, choices=[100, 500, 3000, 10000],
-                        help="Fee tier in bps (100=0.01%%, 500=0.05%%, 3000=0.3%%, 10000=1%%)")
-    parser.add_argument("--with-impact", action="store_true",
-                        help="Calculate price impact (requires pool address)")
+    parser = argparse.ArgumentParser(
+        description="Test Uniswap V3 trade cost estimation"
+    )
+    parser.add_argument(
+        "--token-in",
+        default="USDC",
+        choices=TOKENS.keys(),
+        help="Input token symbol (default: USDC)",
+    )
+    parser.add_argument(
+        "--token-out",
+        default="WBTC",
+        choices=TOKENS.keys(),
+        help="Output token symbol (default: WBTC)",
+    )
+    parser.add_argument(
+        "--amount",
+        type=float,
+        default=1000.0,
+        help="Input amount in human-readable units (default: 1000)",
+    )
+    parser.add_argument(
+        "--fee",
+        type=int,
+        choices=[100, 500, 3000, 10000],
+        help="Fee tier in bps (100=0.01%%, 500=0.05%%, 3000=0.3%%, 10000=1%%)",
+    )
+    parser.add_argument(
+        "--with-impact",
+        action="store_true",
+        help="Calculate price impact (requires pool address)",
+    )
 
     args = parser.parse_args()
 
@@ -135,16 +156,22 @@ def main():
                 amount_in,
                 pool_addr,
                 token_in["decimals"],
-                token_out["decimals"]
+                token_out["decimals"],
             )
 
             amount_out_human = result["amountOut"] / 10 ** token_out["decimals"]
 
             print(f"\nResults:")
             print(f"  Output amount: {amount_out_human:.8f} {args.token_out}")
-            print(f"  Execution price: {result['execPrice']:.8f} {args.token_out}/{args.token_in}")
-            print(f"  Mid price: {result['midPrice']:.8f} {args.token_out}/{args.token_in}")
-            print(f"  Price impact: {result['priceImpactBps']:.2f} bps ({result['priceImpactBps']/100:.2f}%)")
+            print(
+                f"  Execution price: {result['execPrice']:.8f} {args.token_out}/{args.token_in}"
+            )
+            print(
+                f"  Mid price: {result['midPrice']:.8f} {args.token_out}/{args.token_in}"
+            )
+            print(
+                f"  Price impact: {result['priceImpactBps']:.2f} bps ({result['priceImpactBps']/100:.2f}%)"
+            )
             print(f"  Ticks crossed: {result['ticksCrossed']}")
             print(f"  Gas estimate: {result['gasEstimate']:,}")
 
@@ -152,11 +179,7 @@ def main():
             # Basic quote
             print("Querying Uniswap V3 QuoterV2...")
             result = quote_exact_input_single(
-                w3,
-                token_in["address"],
-                token_out["address"],
-                fee,
-                amount_in
+                w3, token_in["address"], token_out["address"], fee, amount_in
             )
 
             amount_out_human = result["amountOut"] / 10 ** token_out["decimals"]
@@ -168,7 +191,9 @@ def main():
 
             # Calculate simple execution price
             exec_price = amount_out_human / args.amount
-            print(f"  Execution price: {exec_price:.8f} {args.token_out}/{args.token_in}")
+            print(
+                f"  Execution price: {exec_price:.8f} {args.token_out}/{args.token_in}"
+            )
 
         if not args.with_impact and pool_addr:
             print(f"\nTip: Use --with-impact flag to see price impact analysis")

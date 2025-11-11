@@ -10,7 +10,9 @@ from web3 import Web3
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 from uniswap import find_all_pools_for_pair, get_token_config, discover_pool
 
@@ -54,9 +56,7 @@ for token_in, token_out in test_pairs:
 
         # Find all pools for this pair
         pools = find_all_pools_for_pair(
-            w3,
-            token_in_config['address'],
-            token_out_config['address']
+            w3, token_in_config["address"], token_out_config["address"]
         )
 
         if pools:
@@ -70,7 +70,9 @@ for token_in, token_out in test_pairs:
         # Test auto-discover (picks best pool)
         try:
             best_pool = discover_pool(w3, token_in, token_out)
-            print(f"  Best pool: {best_pool['address']} ({best_pool['fee'] / 10000}% fee)")
+            print(
+                f"  Best pool: {best_pool['address']} ({best_pool['fee'] / 10000}% fee)"
+            )
         except Exception as e:
             print(f"  Auto-discover failed: {e}")
 

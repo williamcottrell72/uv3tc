@@ -12,13 +12,15 @@ from web3 import Web3
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.insert(
+    0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 from uniswap import (
     analyze_trade_costs,
     get_recommended_amounts,
     get_token_liquidity_tier,
-    print_liquidity_summary
+    print_liquidity_summary,
 )
 
 # Check for Infura API key
@@ -45,9 +47,9 @@ print_liquidity_summary()
 
 # Test cases for each liquidity tier
 test_cases = [
-    ("USDC", "WBTC", "high"),      # High liquidity
-    ("RPL", "WETH", "medium"),     # Medium liquidity
-    ("FLOKI", "WETH", "low")       # Low liquidity
+    ("USDC", "WBTC", "high"),  # High liquidity
+    ("RPL", "WETH", "medium"),  # Medium liquidity
+    ("FLOKI", "WETH", "low"),  # Low liquidity
 ]
 
 results_summary = []
@@ -72,51 +74,61 @@ for token_in, token_out, expected_tier in test_cases:
             token_in_symbol=token_in,
             token_out_symbol=token_out,
             amounts_in=amounts,
-            verbose=True
+            verbose=True,
         )
 
         if len(df) > 0:
-            avg_impact = df['price_impact_bps'].mean()
-            max_impact = df['price_impact_bps'].max()
+            avg_impact = df["price_impact_bps"].mean()
+            max_impact = df["price_impact_bps"].max()
             success_rate = len(df) / len(amounts)
 
-            results_summary.append({
-                "pair": f"{token_in}/{token_out}",
-                "tier": expected_tier,
-                "avg_impact_bps": avg_impact,
-                "max_impact_bps": max_impact,
-                "success_rate": success_rate,
-                "num_successful": len(df),
-                "num_total": len(amounts)
-            })
+            results_summary.append(
+                {
+                    "pair": f"{token_in}/{token_out}",
+                    "tier": expected_tier,
+                    "avg_impact_bps": avg_impact,
+                    "max_impact_bps": max_impact,
+                    "success_rate": success_rate,
+                    "num_successful": len(df),
+                    "num_total": len(amounts),
+                }
+            )
 
             print(f"\nSummary:")
-            print(f"  Average Price Impact: {avg_impact:.2f} bps ({avg_impact/100:.2f}%)")
-            print(f"  Maximum Price Impact: {max_impact:.2f} bps ({max_impact/100:.2f}%)")
+            print(
+                f"  Average Price Impact: {avg_impact:.2f} bps ({avg_impact/100:.2f}%)"
+            )
+            print(
+                f"  Maximum Price Impact: {max_impact:.2f} bps ({max_impact/100:.2f}%)"
+            )
             print(f"  Successful trades: {len(df)}/{len(amounts)}")
         else:
             print(f"\n  No successful trades for {token_in}/{token_out}")
-            results_summary.append({
+            results_summary.append(
+                {
+                    "pair": f"{token_in}/{token_out}",
+                    "tier": expected_tier,
+                    "avg_impact_bps": None,
+                    "max_impact_bps": None,
+                    "success_rate": 0,
+                    "num_successful": 0,
+                    "num_total": len(amounts),
+                }
+            )
+
+    except Exception as e:
+        print(f"\nError analyzing {token_in}/{token_out}: {e}")
+        results_summary.append(
+            {
                 "pair": f"{token_in}/{token_out}",
                 "tier": expected_tier,
                 "avg_impact_bps": None,
                 "max_impact_bps": None,
                 "success_rate": 0,
                 "num_successful": 0,
-                "num_total": len(amounts)
-            })
-
-    except Exception as e:
-        print(f"\nError analyzing {token_in}/{token_out}: {e}")
-        results_summary.append({
-            "pair": f"{token_in}/{token_out}",
-            "tier": expected_tier,
-            "avg_impact_bps": None,
-            "max_impact_bps": None,
-            "success_rate": 0,
-            "num_successful": 0,
-            "num_total": len(amounts)
-        })
+                "num_total": len(amounts),
+            }
+        )
 
 # ========================================
 # Final Comparison
@@ -127,10 +139,16 @@ print("=" * 70)
 
 for result in results_summary:
     print(f"\n{result['tier'].upper()}-LIQUIDITY ({result['pair']}):")
-    if result['avg_impact_bps'] is not None:
-        print(f"  Avg Impact: {result['avg_impact_bps']:.2f} bps ({result['avg_impact_bps']/100:.2f}%)")
-        print(f"  Max Impact: {result['max_impact_bps']:.2f} bps ({result['max_impact_bps']/100:.2f}%)")
-    print(f"  Success Rate: {result['num_successful']}/{result['num_total']} ({result['success_rate']*100:.0f}%)")
+    if result["avg_impact_bps"] is not None:
+        print(
+            f"  Avg Impact: {result['avg_impact_bps']:.2f} bps ({result['avg_impact_bps']/100:.2f}%)"
+        )
+        print(
+            f"  Max Impact: {result['max_impact_bps']:.2f} bps ({result['max_impact_bps']/100:.2f}%)"
+        )
+    print(
+        f"  Success Rate: {result['num_successful']}/{result['num_total']} ({result['success_rate']*100:.0f}%)"
+    )
 
 print("\n" + "=" * 70)
 print("Key Takeaways:")

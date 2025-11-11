@@ -239,6 +239,29 @@ Price impact varies dramatically by liquidity:
 - Medium-liquidity pools show 1-5% impact on $100K+ trades
 - Low-liquidity pools can have 10-100x higher price impact even on small trades
 
+### Price Analysis: Before, During, and After
+
+The toolkit tracks three different price points for comprehensive analysis:
+
+1. **Mid Price (Before Trade)**: The pool's spot price before the trade executes
+2. **Execution Price**: The average price across the entire trade (total output / total input)
+3. **Price After Trade**: The pool's marginal price after the trade completes
+
+These are all displayed on the execution price plot, showing how the trade moves the market:
+
+```python
+df = analyze_trade_costs(w3, "USDC", "WETH", [1000, 10000, 100000])
+
+# Access all three prices
+print(f"Mid Price (Before): {df['mid_price'][0]:.6f}")
+print(f"Exec Price (Avg):   {df['exec_price'][0]:.6f}")
+print(f"Price After Trade:  {df['price_after'][0]:.6f}")
+
+# Visualize all three on the same plot
+fig = plot_combined_analysis(df, "USDC", "WETH")
+fig.show()
+```
+
 ## API Reference
 
 ### Main Functions
