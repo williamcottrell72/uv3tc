@@ -87,18 +87,6 @@ uv3tc/
 └── README.md
 ```
 
-**Import directly from the modules** (not from a package):
-```python
-# ✅ Correct - direct module imports
-from tradecost import analyze_trade_costs
-from config import get_pool_config, get_recommended_amounts
-from plots import plot_combined_analysis
-from pool_finder import discover_pool
-from utils import get_abi_from_etherscan
-
-# ❌ Incorrect - package-style imports don't work
-# from uniswap import analyze_trade_costs  # This will fail
-```
 
 ## Working with Low-Liquidity Pools
 
