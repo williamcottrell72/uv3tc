@@ -2,11 +2,43 @@
 
 Tools for analyzing trading costs on Uniswap V3, including price impact, slippage, and gas costs.
 
+## Installation
+
+### Requirements
+
+- Python 3.8+
+- Required packages:
+  ```bash
+  pip install web3 pandas plotly requests
+  ```
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/uv3tc.git
+   cd uv3tc
+   ```
+
+2. Set your Infura API key (required for Ethereum RPC access):
+   ```bash
+   export INFURA_API_KEY="your_infura_api_key"
+   ```
+   Get a free Infura key at [https://infura.io](https://infura.io)
+
+3. (Optional) Set Etherscan API key for ABI fetching:
+   ```bash
+   export ETHERSCAN_API_KEY="your_etherscan_api_key"
+   ```
+   Get a free key at [https://etherscan.io/apis](https://etherscan.io/apis)
+
 ## Quick Start
 
 ```python
 from web3 import Web3
-from uniswap import analyze_trade_costs, plot_combined_analysis, get_recommended_amounts
+from tradecost import analyze_trade_costs
+from plots import plot_combined_analysis
+from config import get_recommended_amounts
 
 # Connect to Ethereum
 w3 = Web3(Web3.HTTPProvider(f"https://mainnet.infura.io/v3/{INFURA_API_KEY}"))
@@ -36,6 +68,37 @@ fig.show()
 - **Interactive Plots**: Plotly visualizations for analysis
 - **52 Tokens Across 3 Liquidity Tiers**: Pre-configured high, medium, and low liquidity tokens
 - **Smart Trade Sizing**: Helper functions automatically recommend appropriate trade amounts based on pool liquidity
+
+## File Structure
+
+The project uses a simple flat module structure (not a package):
+
+```
+uv3tc/
+├── tradecost.py          # Core analysis functions (analyze_trade_costs, quote_with_price_impact)
+├── config.py             # Token and pool configurations, liquidity helper functions
+├── pool_finder.py        # Automatic pool discovery via Uniswap V3 Factory
+├── plots.py              # Plotly visualization functions
+├── utils.py              # ABI fetching utilities for Etherscan
+├── __init__.py           # Module exports (for reference, but use direct imports)
+├── UniswapTradeCosts.ipynb   # Interactive Jupyter notebook
+├── examples/             # Example scripts
+├── test/                 # Test scripts
+└── README.md
+```
+
+**Import directly from the modules** (not from a package):
+```python
+# ✅ Correct - direct module imports
+from tradecost import analyze_trade_costs
+from config import get_pool_config, get_recommended_amounts
+from plots import plot_combined_analysis
+from pool_finder import discover_pool
+from utils import get_abi_from_etherscan
+
+# ❌ Incorrect - package-style imports don't work
+# from uniswap import analyze_trade_costs  # This will fail
+```
 
 ## Working with Low-Liquidity Pools
 
@@ -73,7 +136,7 @@ df_floki = analyze_trade_costs(w3, "FLOKI", "WETH", [0.1, 1, 10, 100])
 
 Run the comparison script:
 ```bash
-python uniswap/examples/compare_liquidity.py
+python examples/compare_liquidity.py
 ```
 
 ## Pool Discovery
@@ -81,7 +144,7 @@ python uniswap/examples/compare_liquidity.py
 Pools are automatically discovered if not in the config:
 
 ```python
-from uniswap import find_all_pools_for_pair, discover_pool
+from pool_finder import find_all_pools_for_pair, discover_pool
 
 # Find all pools for a pair
 pools = find_all_pools_for_pair(w3, token_a_address, token_b_address)
@@ -127,7 +190,7 @@ Shallow liquidity pools with high price impact (5-50%) even on small trades
 Use these functions to work with liquidity tiers:
 
 ```python
-from uniswap import (
+from config import (
     get_tokens_by_liquidity,
     get_token_liquidity_tier,
     get_recommended_amounts,
@@ -216,7 +279,7 @@ The ABIs used in this toolkit (QuoterV2, Pool, Factory) were obtained from Ether
 #### Fetch ABIs Programmatically
 
 ```python
-from uniswap import get_abi_from_etherscan, get_minimal_abi, UNISWAP_V3_ADDRESSES
+from utils import get_abi_from_etherscan, get_minimal_abi, UNISWAP_V3_ADDRESSES
 
 # Get your free API key at https://etherscan.io/apis
 ETHERSCAN_API_KEY = "YOUR_KEY_HERE"
@@ -250,7 +313,7 @@ You can also view ABIs directly on Etherscan:
 export ETHERSCAN_API_KEY="your_key_here"
 
 # Run the demonstration
-python -m uniswap.utils
+python utils.py
 ```
 
 This will show:
@@ -294,29 +357,29 @@ Example:
 
 **Compare High vs Low Liquidity:**
 ```bash
-python uniswap/examples/compare_liquidity.py
+python examples/compare_liquidity.py
 ```
 Demonstrates the dramatic difference between high-liquidity (USDC/WBTC) and low-liquidity (FLOKI/WETH) pools.
 
 **Compare All Liquidity Tiers:**
 ```bash
-python uniswap/examples/compare_all_liquidity_tiers.py
+python examples/compare_all_liquidity_tiers.py
 ```
 Comprehensive comparison of high, medium, and low liquidity pools showing how trade costs scale with pool depth.
 
 **Pool Discovery:**
 ```bash
-python uniswap/test/test_pool_discovery.py
+python test/test_pool_discovery.py
 ```
 Shows how pools are automatically discovered via the Uniswap V3 Factory contract.
 
 **Fetch ABIs from Etherscan:**
 ```bash
 export ETHERSCAN_API_KEY="your_key_here"
-python uniswap/examples/fetch_abis.py
+python examples/fetch_abis.py
 ```
 Demonstrates how to programmatically fetch ABIs from Etherscan and create minimal ABIs. Shows how the ABIs in tradecost.py were originally obtained.
 
 ### Jupyter Notebooks
 
-See `notebooks/UniswapTradeCosts.ipynb` for an interactive analysis with visualizations.
+See `UniswapTradeCosts.ipynb` for an interactive analysis with visualizations.
