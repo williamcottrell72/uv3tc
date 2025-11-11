@@ -1,13 +1,14 @@
 """Uniswap V3 trade cost estimation tools."""
 
-from .tradecost import (
+from tradecost import (
     quote_exact_input_single,
     quote_with_price_impact,
     get_quoter_contract,
     analyze_trade_costs,
-    get_eth_price_usd
+    get_eth_price_usd,
+    CHAINLINK_ETH_USD
 )
-from .config import (
+from config import (
     get_token_config,
     get_pool_config,
     list_available_tokens,
@@ -20,19 +21,19 @@ from .config import (
     POOLS,
     LIQUIDITY_TIERS
 )
-from .pool_finder import (
+from pool_finder import (
     find_pool_address,
     find_all_pools_for_pair,
     discover_pool
 )
-from .plots import (
+from plots import (
     plot_amount_in_vs_out,
     plot_price_impact,
     plot_cost_of_impact,
     plot_combined_analysis,
     print_summary_stats
 )
-from .utils import (
+from utils import (
     get_abi_from_etherscan,
     extract_function_abi,
     extract_functions_abi,
@@ -49,6 +50,7 @@ __all__ = [
     'get_quoter_contract',
     'analyze_trade_costs',
     'get_eth_price_usd',
+    'CHAINLINK_ETH_USD',
     # Config functions
     'get_token_config',
     'get_pool_config',

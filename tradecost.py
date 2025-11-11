@@ -67,6 +67,24 @@ POOL_ABI = [
 
 Q96 = 2 ** 96
 
+# Chainlink ETH/USD Price Feed (Mainnet)
+CHAINLINK_ETH_USD = Web3.to_checksum_address("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
+
+# Chainlink Price Feed ABI (minimal - just latestRoundData)
+CHAINLINK_ABI = [{
+    "name": "latestRoundData",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+        {"name": "roundId", "type": "uint80"},
+        {"name": "answer", "type": "int256"},
+        {"name": "startedAt", "type": "uint256"},
+        {"name": "updatedAt", "type": "uint256"},
+        {"name": "answeredInRound", "type": "uint80"}
+    ]
+}]
+
 
 def get_quoter_contract(w3):
     """Get the Uniswap V3 QuoterV2 contract instance."""
@@ -212,41 +230,36 @@ def quote_with_price_impact(w3, token_in, token_out, fee, amount_in, pool_addr, 
 
 def get_eth_price_usd(w3):
     """
-    Get current ETH price in USD from WETH/USDC pool.
+    Get current ETH price in USD from Chainlink oracle.
+
+    Uses the Chainlink ETH/USD price feed to get accurate, manipulation-resistant
+    price data without any DEX price impact.
 
     Args:
         w3: Web3 instance connected to Ethereum node
 
     Returns:
         float: ETH price in USD
+
+    Note:
+        Chainlink price feeds return prices with 8 decimals of precision.
+        Feed address: 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419 (Mainnet)
     """
     try:
-        # Use WETH/USDC pool to get ETH price
-        weth_config = get_token_config("WETH")
-        usdc_config = get_token_config("USDC")
-        pool_config = get_pool_config("WETH", "USDC")
+        # Get Chainlink price feed contract
+        price_feed = w3.eth.contract(address=CHAINLINK_ETH_USD, abi=CHAINLINK_ABI)
 
-        # Get a small quote to determine price (1 WETH)
-        amount_in = 10 ** weth_config["decimals"]  # 1 WETH
+        # Get latest price data
+        round_id, answer, started_at, updated_at, answered_in_round = price_feed.functions.latestRoundData().call()
 
-        result = quote_with_price_impact(
-            w3,
-            weth_config["address"],
-            usdc_config["address"],
-            pool_config["fee"],
-            amount_in,
-            pool_config["address"],
-            weth_config["decimals"],
-            usdc_config["decimals"]
-        )
+        # Chainlink returns price with 8 decimals
+        eth_price_usd = answer / 10**8
 
-        # Use mid price for ETH price
-        eth_price_usd = 1 / result["midPrice"]  # USDC per WETH
         return eth_price_usd
 
     except Exception as e:
-        # Fallback to a reasonable default if query fails
-        print(f"Warning: Could not fetch ETH price, using default: {e}")
+        # Fallback to a reasonable default if oracle query fails
+        print(f"Warning: Could not fetch ETH price from Chainlink oracle, using default: {e}")
         return 3500.0  # Reasonable fallback
 
 

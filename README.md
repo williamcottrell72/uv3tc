@@ -64,7 +64,8 @@ fig.show()
 
 - **Automatic Pool Discovery**: Finds Uniswap V3 pools dynamically via the Factory contract
 - **Price Impact Analysis**: Calculate real-world slippage for various trade sizes
-- **Gas Cost Estimation**: Includes ETH price and converts gas to USD
+- **Gas Cost Estimation**: Uses Chainlink oracle for accurate ETH price, converts gas to USD
+- **Chainlink Price Oracles**: ETH/USD price from Chainlink oracle (manipulation-resistant, no DEX impact)
 - **Interactive Plots**: Plotly visualizations for analysis
 - **52 Tokens Across 3 Liquidity Tiers**: Pre-configured high, medium, and low liquidity tokens
 - **Smart Trade Sizing**: Helper functions automatically recommend appropriate trade amounts based on pool liquidity
@@ -202,6 +203,27 @@ amounts = get_recommended_amounts("FLOKI") # Returns [0.1, 1, 10, 100, 1000]
 print_liquidity_summary()
 ```
 
+## Price Data: Chainlink Oracle
+
+This toolkit uses **Chainlink price oracles** for ETH/USD pricing to ensure accurate, manipulation-resistant price data.
+
+
+### Implementation
+
+```python
+from tradecost import get_eth_price_usd, CHAINLINK_ETH_USD
+
+# Get current ETH price from Chainlink oracle
+eth_price = get_eth_price_usd(w3)
+print(f"ETH Price: ${eth_price:,.2f}")
+
+# Oracle contract address (for reference)
+print(f"Using Chainlink ETH/USD feed: {CHAINLINK_ETH_USD}")
+# 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
+```
+
+The Chainlink ETH/USD price feed on Ethereum mainnet is located at `0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419` and provides prices with 8 decimals of precision.
+
 ## Understanding Price Impact
 
 Price impact varies dramatically by liquidity:
@@ -223,7 +245,7 @@ Price impact varies dramatically by liquidity:
 
 - `analyze_trade_costs(w3, token_in, token_out, amounts_in, fee=None)` - Complete analysis
 - `quote_with_price_impact(w3, ...)` - Single quote with price impact
-- `get_eth_price_usd(w3)` - Current ETH price from WETH/USDC pool
+- `get_eth_price_usd(w3)` - Current ETH price from Chainlink oracle (manipulation-resistant)
 
 ### Pool Discovery
 
